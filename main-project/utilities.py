@@ -3,25 +3,24 @@ utilities.py
 ------------
 Shared configuration and small helper functions for the project.
 """
-
+#File path checkers, Logging, and Checking if data actually exists
+#important libraries
 from __future__ import annotations
-
 import logging
 import sys
 from pathlib import Path
-
 import pandas as pd
-
-
+#getting the path
 BASE_DIR = Path(__file__).resolve().parent
 
+#Central config
 CONFIG = {
     "anime_path": BASE_DIR / "data" / "anime.csv",
     "popularity_dir": BASE_DIR / "data" / "popularity",
     "output_dir": BASE_DIR / "output",
     "clustered_data_path": BASE_DIR / "output" / "clustered_anime.csv",
     "report_path": BASE_DIR / "output" / "cluster_report.csv",
-    "n_clusters": 2,
+    "n_clusters": 2,    #editable option
     "random_state": 42,
     "features": [
         "critic_rating",
@@ -35,7 +34,7 @@ CONFIG = {
     ],
 }
 
-
+#just making prints
 logging.basicConfig(
     level=logging.INFO,
     format="%(levelname)s: %(message)s",
@@ -48,14 +47,13 @@ LOGGER = logging.getLogger("ratings_predictor")
 def log(message: str) -> None:
     LOGGER.info(message)
 
-
 # Create the output folder if it does not already exist.
 def ensure_output_dir() -> Path:
     output_dir = Path(CONFIG["output_dir"])
     output_dir.mkdir(parents=True, exist_ok=True)
     return output_dir
 
-
+#Checks if the data actually exists
 # Check whether the required datasets are present on disk.
 def check_data_files() -> list[str]:
     missing = []

@@ -9,14 +9,12 @@ Load, clean, and merge the two datasets used in this version of the project:
    MyAnimeList popularity snapshots with vote totals, favourites, and rank
 """
 
+#important libraries
 from __future__ import annotations
-
 import re
 from pathlib import Path
-
 import numpy as np
 import pandas as pd
-
 from utilities import log
 
 
@@ -108,7 +106,8 @@ def load_popularity_database(popularity_dir: str | Path) -> pd.DataFrame:
     ]
 
 
-# Combine the anime ratings and MAL popularity data and create clustering features.
+#combine anime ratings and MAL popularity data
+#create clustering features.
 def load_and_merge_data(anime_path: str | Path, popularity_dir: str | Path) -> pd.DataFrame:
     """Load both databases, merge them on normalized title, and build features."""
     anime_df = load_anime_database(anime_path)
@@ -127,8 +126,9 @@ def load_and_merge_data(anime_path: str | Path, popularity_dir: str | Path) -> p
     log(f"Merged rows: {len(merged)}")
     return merged
 
+#Thursday 1 & 4pm 16th - Auntie
 
-# Extract the numeric feature columns and fill missing values before clustering.
+#Extract the numeric feature columns and fill out any missing values before clustering. (cleaning)
 def get_feature_matrix(df: pd.DataFrame, features: list[str]) -> pd.DataFrame:
     """Return the numeric feature matrix used for clustering."""
     missing = [feature for feature in features if feature not in df.columns]
