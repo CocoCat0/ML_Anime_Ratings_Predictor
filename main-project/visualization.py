@@ -3,15 +3,13 @@ visualization.py
 ----------------
 Simple plots for the clustering and VAE analyses.
 """
-
+# important libraries
 from __future__ import annotations
-
 import matplotlib.pyplot as plt
 import pandas as pd
-
 from utilities import ensure_output_dir, log
 
-
+#just making an output directory and outputting all the scatter plots into it
 # Create all project plots in one place after clustering is complete.
 def plot_all(
     df: pd.DataFrame,
@@ -30,7 +28,9 @@ def plot_all(
     _plot_vae_latent_space(df, vae_points, output_dir / "vae_latent_space.png")
     _plot_vae_loss(vae_history, output_dir / "vae_loss.png")
 
-
+#X shows critic ratings
+#Y shows MyAnimeList Score
+#compare professional v user ratings
 # Plot critic ratings against MyAnimeList weighted scores.
 def _plot_rating_scatter(df: pd.DataFrame, cluster_column: str, path, label_prefix: str) -> None:
     fig, ax = plt.subplots(figsize=(8, 6))
@@ -44,7 +44,9 @@ def _plot_rating_scatter(df: pd.DataFrame, cluster_column: str, path, label_pref
     plt.close(fig)
     log(f"Saved {path.name}")
 
-
+#X-axis: Log Votes
+#Y-axis: Log(Favorites)
+#We utilized log since popularity data are usually skewed and it makes it easier to viz
 # Plot MyAnimeList votes against favourites to show popularity concentration.
 def _plot_popularity_scatter(df: pd.DataFrame, cluster_column: str, path, label_prefix: str) -> None:
     fig, ax = plt.subplots(figsize=(8, 6))

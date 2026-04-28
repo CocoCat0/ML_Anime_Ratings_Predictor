@@ -7,8 +7,8 @@ Simple entry point for clustering anime titles using:
 - popularity/*.csv for MyAnimeList popularity and score data
 """
 
+#important libraries
 from __future__ import annotations
-
 import argparse
 import sys
 

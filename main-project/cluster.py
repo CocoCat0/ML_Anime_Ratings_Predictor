@@ -4,22 +4,24 @@ cluster.py
 Core clustering and reporting helpers.
 """
 
+# Importing the important libraries
 from __future__ import annotations
-
 import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import StandardScaler
-
 from utilities import CONFIG
 
 
 # Fit the KMeans model using either the provided k or the default from the config.
+# Trains the KMeans clustering model 
 def fit_kmeans(X_scaled, n_clusters: int | None = None) -> KMeans:
     k = n_clusters or CONFIG["n_clusters"]
     model = KMeans(n_clusters=k, random_state=CONFIG["random_state"], n_init=10)
+    #Learns cluster centers from SCALED DATA
     model.fit(X_scaled)
     return model
+    #model should be trained
 
 
 # Fit a Gaussian Mixture Model using the provided or configured cluster count.
