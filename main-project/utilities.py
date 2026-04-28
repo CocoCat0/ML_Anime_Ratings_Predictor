@@ -20,8 +20,13 @@ CONFIG = {
     "output_dir": BASE_DIR / "output",
     "clustered_data_path": BASE_DIR / "output" / "clustered_anime.csv",
     "report_path": BASE_DIR / "output" / "cluster_report.csv",
-    "n_clusters": 2,    #editable option
+    "n_clusters": 2,
     "random_state": 42,
+    "vae_hidden_dim": 16,
+    "vae_latent_dim": 2,
+    "vae_epochs": 350,
+    "vae_learning_rate": 0.01,
+    "vae_beta": 0.08,
     "features": [
         "critic_rating",
         "mal_weighted_score",

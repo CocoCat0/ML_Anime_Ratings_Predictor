@@ -126,7 +126,6 @@ def load_and_merge_data(anime_path: str | Path, popularity_dir: str | Path) -> p
     log(f"Merged rows: {len(merged)}")
     return merged
 
-#Thursday 1 & 4pm 16th - Auntie
 
 #Extract the numeric feature columns and fill out any missing values before clustering. (cleaning)
 def get_feature_matrix(df: pd.DataFrame, features: list[str]) -> pd.DataFrame:
