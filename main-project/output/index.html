@@ -3,17 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Anime Clustering Output Report</title>
+  <title>Anime Ratings and Popularity Report</title>
   <style>
     :root {
-      --bg: #f4efe7;
-      --panel: rgba(255, 252, 247, 0.88);
-      --ink: #1f2430;
-      --muted: #5d6573;
-      --accent: #b85042;
-      --accent-2: #3a6ea5;
-      --line: rgba(31, 36, 48, 0.12);
-      --shadow: 0 18px 50px rgba(44, 44, 44, 0.12);
+      --bg: #f2ede5;
+      --panel: rgba(250, 245, 238, 0.88);
+      --panel-strong: rgba(255, 250, 244, 0.93);
+      --ink: #17212b;
+      --muted: #4f5b66;
+      --accent: #a44a3f;
+      --accent-2: #305f86;
+      --line: rgba(23, 33, 43, 0.12);
+      --shadow: 0 20px 55px rgba(23, 33, 43, 0.16);
       --radius: 22px;
     }
     * { box-sizing: border-box; }
@@ -21,37 +22,55 @@
       margin: 0;
       font-family: Georgia, "Times New Roman", serif;
       color: var(--ink);
+      background: var(--bg);
+      position: relative;
+      min-height: 100vh;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
       background:
-        radial-gradient(circle at top left, rgba(184, 80, 66, 0.18), transparent 32%),
-        radial-gradient(circle at top right, rgba(58, 110, 165, 0.18), transparent 28%),
-        linear-gradient(180deg, #f7f2ea 0%, #efe7dc 100%);
+        linear-gradient(rgba(17, 24, 32, 0.52), rgba(17, 24, 32, 0.62)),
+        url('site_background.png') center / cover no-repeat;
+      z-index: -2;
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at top left, rgba(212, 118, 90, 0.2), transparent 28%),
+        radial-gradient(circle at top right, rgba(48, 95, 134, 0.18), transparent 30%),
+        linear-gradient(180deg, rgba(242, 237, 229, 0.16), rgba(242, 237, 229, 0.34));
+      z-index: -1;
     }
     .shell {
-      width: min(1200px, calc(100% - 32px));
+      width: min(1220px, calc(100% - 32px));
       margin: 0 auto;
-      padding: 32px 0 56px;
+      padding: 28px 0 56px;
     }
     .hero {
-      padding: 36px;
-      border-radius: calc(var(--radius) + 6px);
-      background: linear-gradient(135deg, rgba(255,255,255,0.88), rgba(255,248,240,0.78));
+      padding: 34px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, rgba(255, 249, 241, 0.94), rgba(244, 232, 221, 0.82));
+      border: 1px solid rgba(255, 255, 255, 0.48);
       box-shadow: var(--shadow);
-      border: 1px solid rgba(255,255,255,0.7);
     }
     .hero h1 {
       margin: 0 0 10px;
-      font-size: clamp(2.2rem, 5vw, 4rem);
+      font-size: clamp(2.2rem, 5vw, 4.2rem);
       line-height: 0.95;
-      letter-spacing: -0.04em;
+      letter-spacing: -0.05em;
     }
     .hero p {
-      max-width: 760px;
       margin: 0;
+      max-width: 820px;
       color: var(--muted);
       font-size: 1.05rem;
     }
     .section {
-      margin-top: 28px;
+      margin-top: 26px;
       padding: 28px;
       border-radius: var(--radius);
       background: var(--panel);
@@ -59,18 +78,30 @@
       backdrop-filter: blur(10px);
     }
     h2 {
-      margin: 0 0 16px;
-      font-size: 1.55rem;
+      margin: 0 0 14px;
+      font-size: 1.6rem;
+    }
+    h3 {
+      margin: 0 0 10px;
+      font-size: 1.08rem;
+    }
+    p {
+      line-height: 1.6;
+    }
+    .lede {
+      margin-top: 0;
+      color: var(--muted);
     }
     .cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
       gap: 14px;
+      margin-top: 18px;
     }
-    .card, .algo, .graph, .table-wrap {
+    .card, .algo, .graph, .table-wrap, .finding, .fact-list {
       border: 1px solid var(--line);
       border-radius: 18px;
-      background: rgba(255,255,255,0.72);
+      background: rgba(255, 251, 246, 0.8);
     }
     .card {
       padding: 18px;
@@ -83,37 +114,57 @@
       margin-bottom: 6px;
     }
     .metric {
-      font-size: 2rem;
+      font-size: 1.9rem;
       font-weight: 700;
     }
-    .two-col {
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 18px;
+    .metric-note {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.9rem;
     }
-    .algo-grid, .graph-grid {
+    .table-grid, .algo-grid, .graph-grid, .finding-grid {
       display: grid;
+      gap: 16px;
+    }
+    .table-grid {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+    .algo-grid {
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 14px;
     }
-    .algo {
+    .graph-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+      padding: 10px 12px;
+    }
+    .finding-grid {
+      grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.9fr);
+      align-items: start;
+    }
+    .algo, .finding, .fact-list {
       padding: 18px;
     }
-    .algo h3 {
-      margin: 0 0 8px;
-      font-size: 1.1rem;
-    }
-    .algo p {
-      margin: 0 0 10px;
+    .algo p, .finding p {
+      margin: 0;
       color: var(--muted);
     }
-    .algo ul {
-      margin: 0;
+    .algo ul, .fact-list ul {
+      margin: 10px 0 0;
       padding-left: 18px;
     }
-    .dataset-note {
+    .dataset-note, .section-note {
       color: var(--muted);
-      margin-bottom: 14px;
+      margin: 0 0 14px;
+    }
+    .table-wrap {
+      overflow: hidden;
+    }
+    .table-head {
+      padding: 14px 16px 0;
+    }
+    .table-inner {
+      overflow-x: auto;
+      padding: 0 10px 10px;
     }
     table {
       width: 100%;
@@ -131,7 +182,7 @@
       text-transform: uppercase;
       letter-spacing: 0.06em;
       color: var(--muted);
-      background: rgba(58, 110, 165, 0.06);
+      background: rgba(48, 95, 134, 0.08);
     }
     .graph {
       overflow: hidden;
@@ -139,615 +190,262 @@
     .graph img {
       width: 100%;
       display: block;
-      aspect-ratio: 4 / 3;
-      object-fit: cover;
       background: #fff;
+      height: auto;
+      object-fit: contain;
     }
-    .graph .caption, .table-wrap h3 {
-      padding: 14px 16px;
-      margin: 0;
+    .caption {
+      padding: 14px 16px 16px;
     }
-    .caption small {
+    .caption p {
+      margin: 6px 0 0;
       color: var(--muted);
+      font-size: 0.95rem;
     }
-    .table-stack {
-      display: grid;
-      gap: 18px;
+    .finding-grid .fact-list {
+      background: var(--panel-strong);
     }
-    .table-wrap {
-      overflow: hidden;
+    .finding-meta {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.95rem;
     }
-    .table-inner {
-      overflow-x: auto;
-      padding: 0 4px 4px;
-    }
-    .verdict {
-      padding: 18px;
+    .conclusion {
+      padding: 20px;
       border-radius: 18px;
-      background: linear-gradient(135deg, rgba(184, 80, 66, 0.12), rgba(58, 110, 165, 0.08));
       border: 1px solid var(--line);
+      background: linear-gradient(135deg, rgba(164, 74, 63, 0.1), rgba(48, 95, 134, 0.08));
     }
-    .footer {
-      margin-top: 18px;
-      color: var(--muted);
-      font-size: 0.92rem;
+    code {
+      font-family: "Courier New", monospace;
     }
-    @media (max-width: 860px) {
-      .two-col { grid-template-columns: 1fr; }
-      .section, .hero { padding: 22px; }
+    @media (max-width: 900px) {
+      .finding-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero, .section {
+        padding: 22px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="shell">
     <section class="hero">
-      <h1>Anime Clustering Output Report</h1>
-      <p>This dashboard summarizes the generated files in <code>main-project/output</code>, including algorithm comparisons, cluster summaries, plots, and a compact verdict on which model looked strongest on this dataset.</p>
+      <h1>Unsupervised Clustering of Animated Series Based on Critic and Popularity Ratings</h1>
+      <p>This report explores whether anime that are highly rated by critics are also the shows that attract the strongest MyAnimeList engagement, or whether popularity and critical opinion split into different clusters.</p>
+      <p>Group Members: Christofer Vega | Alyssa Sombrero</p>
+      <div class="cards"><article class="card"><div class="eyebrow">Titles</div>
+        <div class="metric">30</div><div class="metric-note">Anime included after merging critic and MAL data.</div>
+      </article><article class="card">
+        <div class="eyebrow">MAL Snapshots</div>
+        <div class="metric">16</div>
+        <div class="metric-note">Latest preview uses Votes_2023_03_16.csv.</div>
+      </article><article class="card">
+        <div class="eyebrow">Best Overall Tradeoff</div>
+        <div class="metric">BIRCH</div>
+        <div class="metric-note">Best silhouette-minus-noise balance in this run.</div>
+      </article><article class="card">
+        <div class="eyebrow">Top Silhouette</div>
+        <div class="metric">0.3387</div>
+        <div class="metric-note">Highest raw separation score among the algorithms.</div>
+      </article><article class="card">
+        <div class="eyebrow">Average Rating Gap</div>
+        <div class="metric">-0.0621</div>
+        <div class="metric-note">Positive means MAL scores are above critic scores on average.</div></article></div>
     </section>
 
     <section class="section">
-      <h2>Overview</h2>
-      <div class="cards"><article class="card"><div class="eyebrow">Titles Clustered</div><div class="metric">30</div></article><article class="card"><div class="eyebrow">Features Used</div><div class="metric">8</div></article><article class="card"><div class="eyebrow">Algorithms</div><div class="metric">5</div></article><article class="card"><div class="eyebrow">Best Balance</div><div class="metric">BIRCH</div></article><article class="card"><div class="eyebrow">Top Silhouette</div><div class="metric">0.3387</div></article><article class="card"><div class="eyebrow">Highest Noise</div><div class="metric">DBSCAN (40%)</div></article></div>
+      <h2>Introduction</h2>
+      <p class="lede">The project is trying to measure the disconnect between two signals: curated critic ratings from <code>anime.csv</code> and community behavior from MyAnimeList snapshots. By clustering titles with both rating and popularity features, the site shows whether the same anime dominate both systems or whether fame, fan activity, and perceived quality separate into different groups.</p>
+      <p class="lede">The clustering output is useful because a simple ranking does not explain why titles differ. Grouping titles by rating gap, engagement, release timing, and runtime reveals where mainstream hits, classics, divisive titles, and universally praised series land relative to one another.</p>
     </section>
 
     <section class="section">
-      <h2>Algorithms</h2>
-      <div class="algo-grid"><article class="algo"><h3>K-Means</h3><p>Centroid-based baseline that forces each title into one of k compact groups.</p><ul><li>Clusters found: 5</li><li>Noise points: 0 (0%)</li><li>Largest cluster: 12</li><li>Silhouette: 0.18</li></ul></article><article class="algo"><h3>GMM</h3><p>Soft clustering with Gaussian components, useful when clusters overlap.</p><ul><li>Clusters found: 5</li><li>Noise points: 0 (0%)</li><li>Largest cluster: 12</li><li>Silhouette: 0.1298</li></ul></article><article class="algo"><h3>DBSCAN</h3><p>Density-based clustering that can label sparse titles as noise.</p><ul><li>Clusters found: 2</li><li>Noise points: 12 (40%)</li><li>Largest cluster: 15</li><li>Silhouette: 0.3387</li></ul></article><article class="algo"><h3>HDBSCAN</h3><p>Hierarchical density clustering that adapts cluster shape and can keep noise separate.</p><ul><li>Clusters found: 1</li><li>Noise points: 4 (13.33%)</li><li>Largest cluster: 26</li><li>Silhouette: N/A</li></ul></article><article class="algo"><h3>BIRCH</h3><p>Tree-based clustering that scales well and often gives balanced partitions.</p><ul><li>Clusters found: 5</li><li>Noise points: 0 (0%)</li><li>Largest cluster: 13</li><li>Silhouette: 0.2029</li></ul></article></div>
+      <h2>Setup</h2>
+      <p class="lede">Clone the repository, move into <code>main-project</code>, install the Python dependencies used by the project, and run <code>python main.py</code> to generate the clustering outputs and rebuild the website. If you want the plots refreshed as well, run the same command without disabling visualization so the output images are recreated before the report page is written.</p>
+      <p class="lede">A typical workflow is: <code>git clone ...</code>, <code>cd CS472-ML_Ratings_Predictor\main-project</code>, install packages such as <code>pandas</code>, <code>scikit-learn</code>, <code>matplotlib</code>, and the clustering dependencies, then execute <code>python main.py</code>.</p>
     </section>
 
     <section class="section">
-      <h2>Dataset | Snapshot</h2>
-      <p class="dataset-note">The snapshot below shows the first 10 rows from <code>clustered_anime.csv</code> after feature engineering and label assignment.</p>
-      <div class="table-wrap">
-        <div class="table-inner"><table class="dataframe dataframe">
+      <h2>GitHub</h2>
+      <p class="lede">Repository link: <a href="https://github.com/CocoCat0/CS472-ML_Ratings_Predictor" target="_blank" rel="noreferrer">https://github.com/CocoCat0/CS472-ML_Ratings_Predictor</a></p>
+    </section>
+
+    <section class="section">
+      <h2>Dataset</h2>
+      <p class="dataset-note">The report uses critic data from <code>anime.csv</code> and MAL popularity snapshots from <code>Votes_2023_03_16.csv</code>. The tables below show the first 5 rows of each source.</p>
+      <div class="table-grid">
+        <section class="table-wrap">
+          <div class="table-head">
+            <h3>anime.csv Preview</h3>
+          </div>
+          <div class="table-inner"><table class="dataframe dataframe">
   <thead>
     <tr style="text-align: right;">
-      <th>title</th>
-      <th>genre</th>
-      <th>critic_rating</th>
-      <th>mal_weighted_score</th>
-      <th>rating_gap</th>
-      <th>kmeans_cluster</th>
-      <th>gmm_cluster</th>
-      <th>dbscan_cluster</th>
-      <th>hdbscan_cluster</th>
-      <th>birch_cluster</th>
+      <th>Anime</th>
+      <th>Release date</th>
+      <th>Length</th>
+      <th>Genre</th>
+      <th>Rating</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td>Fullmetal Alchemist: Brotherhood</td>
+      <td>(2009-2010)</td>
+      <td>24 min</td>
       <td>Animation, Action, Adventure</td>
       <td>9.1</td>
-      <td>8.9697</td>
-      <td>-0.1303</td>
-      <td>0</td>
-      <td>4</td>
-      <td>-1</td>
-      <td>-1</td>
-      <td>1</td>
     </tr>
     <tr>
-      <td>One Piece</td>
+      <td>Attack on Titan</td>
+      <td>(2013-2023)</td>
+      <td>24 min</td>
       <td>Animation, Action, Adventure</td>
-      <td>8.9</td>
-      <td>8.7102</td>
-      <td>-0.1898</td>
-      <td>1</td>
-      <td>2</td>
-      <td>-1</td>
-      <td>0</td>
-      <td>4</td>
+      <td>9</td>
     </tr>
     <tr>
-      <td>Cowboy Bebop</td>
+      <td>Hunter x Hunter</td>
+      <td>(2011-2014)</td>
+      <td>24 min</td>
       <td>Animation, Action, Adventure</td>
-      <td>8.9</td>
-      <td>8.7158</td>
-      <td>-0.1842</td>
-      <td>3</td>
-      <td>0</td>
-      <td>-1</td>
-      <td>-1</td>
-      <td>2</td>
+      <td>9</td>
     </tr>
     <tr>
-      <td>Dragon Ball Z</td>
+      <td>Bleach: Thousand-Year Blood War</td>
+      <td>(2022- )</td>
+      <td>24 min</td>
       <td>Animation, Action, Adventure</td>
-      <td>8.8</td>
-      <td>8.1701</td>
-      <td>-0.6299</td>
-      <td>1</td>
-      <td>2</td>
-      <td>-1</td>
-      <td>0</td>
-      <td>4</td>
+      <td>9</td>
     </tr>
     <tr>
-      <td>Steins;Gate</td>
-      <td>Animation, Comedy, Drama</td>
-      <td>8.8</td>
-      <td>8.972</td>
-      <td>0.172</td>
-      <td>2</td>
-      <td>0</td>
-      <td>-1</td>
-      <td>0</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <td>Haikyuu!!</td>
-      <td>Animation, Comedy, Drama</td>
-      <td>8.7</td>
-      <td>8.4121</td>
-      <td>-0.2879</td>
-      <td>2</td>
-      <td>1</td>
-      <td>-1</td>
-      <td>0</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <td>Jujutsu Kaisen</td>
-      <td>Animation, Action, Adventure</td>
-      <td>8.6</td>
-      <td>8.6327</td>
-      <td>0.0327</td>
-      <td>0</td>
-      <td>2</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <td>Mob Psycho 100</td>
-      <td>Animation, Action, Comedy</td>
-      <td>8.6</td>
-      <td>8.4649</td>
-      <td>-0.1351</td>
-      <td>2</td>
-      <td>2</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <td>Fullmetal Alchemist</td>
-      <td>Animation, Action, Adventure</td>
-      <td>8.5</td>
-      <td>8.1004</td>
-      <td>-0.3996</td>
-      <td>1</td>
-      <td>2</td>
-      <td>-1</td>
-      <td>0</td>
-      <td>4</td>
-    </tr>
-    <tr>
-      <td>Naruto</td>
-      <td>Animation, Action, Adventure</td>
-      <td>8.4</td>
-      <td>7.9635</td>
-      <td>-0.4365</td>
-      <td>1</td>
-      <td>2</td>
-      <td>-1</td>
-      <td>-1</td>
-      <td>1</td>
+      <td>Ginga eiyû densetsu</td>
+      <td>(1988-1997)</td>
+      <td>25 min</td>
+      <td>Animation, Action, Drama</td>
+      <td>9</td>
     </tr>
   </tbody>
 </table></div>
+        </section>
+        <section class="table-wrap">
+          <div class="table-head">
+            <h3>MAL Snapshot Preview</h3>
+          </div>
+          <div class="table-inner"><table class="dataframe dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Votes</th>
+      <th>Score</th>
+      <th>English Name</th>
+      <th>Favourites count</th>
+      <th>Popularity ranking</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>766783</td>
+      <td>10</td>
+      <td>Death Note</td>
+      <td>3645111</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>765093</td>
+      <td>9</td>
+      <td>Death Note</td>
+      <td>3645111</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>598036</td>
+      <td>8</td>
+      <td>Death Note</td>
+      <td>3645111</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>283202</td>
+      <td>7</td>
+      <td>Death Note</td>
+      <td>3645111</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>94128</td>
+      <td>6</td>
+      <td>Death Note</td>
+      <td>3645111</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table></div>
+        </section>
       </div>
     </section>
 
     <section class="section">
-      <h2>Results | Graphs | Tables</h2>
-      <div class="graph-grid"><figure class="graph"><img src="ratings_scatter.png" alt="Ratings Scatter"><figcaption class="caption">Ratings Scatter<br><small>ratings_scatter.png</small></figcaption></figure><figure class="graph"><img src="popularity_scatter.png" alt="Popularity Scatter"><figcaption class="caption">Popularity Scatter<br><small>popularity_scatter.png</small></figcaption></figure><figure class="graph"><img src="gmm_clusters.png" alt="Gmm Clusters"><figcaption class="caption">Gmm Clusters<br><small>gmm_clusters.png</small></figcaption></figure><figure class="graph"><img src="dbscan_clusters.png" alt="Dbscan Clusters"><figcaption class="caption">Dbscan Clusters<br><small>dbscan_clusters.png</small></figcaption></figure><figure class="graph"><img src="hdbscan_clusters.png" alt="Hdbscan Clusters"><figcaption class="caption">Hdbscan Clusters<br><small>hdbscan_clusters.png</small></figcaption></figure><figure class="graph"><img src="birch_clusters.png" alt="Birch Clusters"><figcaption class="caption">Birch Clusters<br><small>birch_clusters.png</small></figcaption></figure><figure class="graph"><img src="algorithm_ratings_comparison.png" alt="Algorithm Ratings Comparison"><figcaption class="caption">Algorithm Ratings Comparison<br><small>algorithm_ratings_comparison.png</small></figcaption></figure><figure class="graph"><img src="algorithm_popularity_comparison.png" alt="Algorithm Popularity Comparison"><figcaption class="caption">Algorithm Popularity Comparison<br><small>algorithm_popularity_comparison.png</small></figcaption></figure><figure class="graph"><img src="algorithm_metrics_comparison.png" alt="Algorithm Metrics Comparison"><figcaption class="caption">Algorithm Metrics Comparison<br><small>algorithm_metrics_comparison.png</small></figcaption></figure><figure class="graph"><img src="algorithm_cluster_size_comparison.png" alt="Algorithm Cluster Size Comparison"><figcaption class="caption">Algorithm Cluster Size Comparison<br><small>algorithm_cluster_size_comparison.png</small></figcaption></figure><figure class="graph"><img src="vae_latent_space.png" alt="Vae Latent Space"><figcaption class="caption">Vae Latent Space<br><small>vae_latent_space.png</small></figcaption></figure><figure class="graph"><img src="vae_algorithm_comparison.png" alt="Vae Algorithm Comparison"><figcaption class="caption">Vae Algorithm Comparison<br><small>vae_algorithm_comparison.png</small></figcaption></figure><figure class="graph"><img src="vae_loss.png" alt="Vae Loss"><figcaption class="caption">Vae Loss<br><small>vae_loss.png</small></figcaption></figure></div>
-      <div class="table-stack" style="margin-top: 18px;"><section class="table-wrap"><h3>algorithm_comparison_report.csv</h3><div class="table-inner"><table class="dataframe dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th>algorithm</th>
-      <th>clusters_found</th>
-      <th>noise_points</th>
-      <th>noise_pct</th>
-      <th>largest_cluster</th>
-      <th>silhouette_score</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>K-Means</td>
-      <td>5</td>
-      <td>0</td>
-      <td>0</td>
-      <td>12</td>
-      <td>0.18</td>
-    </tr>
-    <tr>
-      <td>GMM</td>
-      <td>5</td>
-      <td>0</td>
-      <td>0</td>
-      <td>12</td>
-      <td>0.1298</td>
-    </tr>
-    <tr>
-      <td>DBSCAN</td>
-      <td>2</td>
-      <td>12</td>
-      <td>40</td>
-      <td>15</td>
-      <td>0.3387</td>
-    </tr>
-    <tr>
-      <td>HDBSCAN</td>
-      <td>1</td>
-      <td>4</td>
-      <td>13.33</td>
-      <td>26</td>
-      <td>N/A</td>
-    </tr>
-    <tr>
-      <td>BIRCH</td>
-      <td>5</td>
-      <td>0</td>
-      <td>0</td>
-      <td>13</td>
-      <td>0.2029</td>
-    </tr>
-  </tbody>
-</table></div></section><section class="table-wrap"><h3>cluster_report.csv</h3><div class="table-inner"><table class="dataframe dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th>kmeans_cluster</th>
-      <th>titles</th>
-      <th>critic_rating</th>
-      <th>mal_weighted_score</th>
-      <th>rating_gap</th>
-      <th>mal_votes_total</th>
-      <th>mal_favourites</th>
-      <th>mal_popularity_rank</th>
-      <th>release_year</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>3</td>
-      <td>8.4</td>
-      <td>8.26</td>
-      <td>-0.14</td>
-      <td>1808318.67</td>
-      <td>817084.33</td>
-      <td>8.33</td>
-      <td>2013.67</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>4</td>
-      <td>8.65</td>
-      <td>8.24</td>
-      <td>-0.41</td>
-      <td>1175500.25</td>
-      <td>81912.25</td>
-      <td>53</td>
-      <td>1998.25</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>10</td>
-      <td>8.28</td>
-      <td>8.36</td>
-      <td>0.08</td>
-      <td>1122876.8</td>
-      <td>35245.5</td>
-      <td>36.9</td>
-      <td>2013.6</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>1</td>
-      <td>8.9</td>
-      <td>8.72</td>
-      <td>-0.18</td>
-      <td>895402</td>
-      <td>N/A</td>
-      <td>43</td>
-      <td>1998</td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td>12</td>
-      <td>7.63</td>
-      <td>7.6</td>
-      <td>-0.04</td>
-      <td>858362.5</td>
-      <td>14937.33</td>
-      <td>71.25</td>
-      <td>2014.08</td>
-    </tr>
-  </tbody>
-</table></div></section><section class="table-wrap"><h3>gmm_cluster_report.csv</h3><div class="table-inner"><table class="dataframe dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th>gmm_cluster</th>
-      <th>titles</th>
-      <th>critic_rating</th>
-      <th>mal_weighted_score</th>
-      <th>rating_gap</th>
-      <th>mal_votes_total</th>
-      <th>mal_favourites</th>
-      <th>mal_popularity_rank</th>
-      <th>release_year</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>12</td>
-      <td>8.08</td>
-      <td>8.23</td>
-      <td>0.15</td>
-      <td>996354.5</td>
-      <td>N/A</td>
-      <td>50.75</td>
-      <td>2011.42</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>10</td>
-      <td>7.78</td>
-      <td>7.63</td>
-      <td>-0.15</td>
-      <td>929403.3</td>
-      <td>17726</td>
-      <td>62.5</td>
-      <td>2015</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>6</td>
-      <td>8.63</td>
-      <td>8.34</td>
-      <td>-0.29</td>
-      <td>1213539.17</td>
-      <td>423780</td>
-      <td>43.67</td>
-      <td>2004.83</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>1</td>
-      <td>7.5</td>
-      <td>7.19</td>
-      <td>-0.31</td>
-      <td>2043535</td>
-      <td>66367</td>
-      <td>5</td>
-      <td>2012</td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td>1</td>
-      <td>9.1</td>
-      <td>8.97</td>
-      <td>-0.13</td>
-      <td>1976420</td>
-      <td>214254</td>
-      <td>3</td>
-      <td>2009</td>
-    </tr>
-  </tbody>
-</table></div></section><section class="table-wrap"><h3>dbscan_cluster_report.csv</h3><div class="table-inner"><table class="dataframe dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th>dbscan_cluster</th>
-      <th>titles</th>
-      <th>critic_rating</th>
-      <th>mal_weighted_score</th>
-      <th>rating_gap</th>
-      <th>mal_votes_total</th>
-      <th>mal_favourites</th>
-      <th>mal_popularity_rank</th>
-      <th>release_year</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>-1</td>
-      <td>12</td>
-      <td>8.3</td>
-      <td>8.09</td>
-      <td>-0.21</td>
-      <td>1234954.25</td>
-      <td>72564.67</td>
-      <td>43.42</td>
-      <td>2006.58</td>
-    </tr>
-    <tr>
-      <td>0</td>
-      <td>3</td>
-      <td>8.43</td>
-      <td>8.45</td>
-      <td>0.01</td>
-      <td>1178490</td>
-      <td>747041</td>
-      <td>35</td>
-      <td>2018.33</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>15</td>
-      <td>7.88</td>
-      <td>7.92</td>
-      <td>0.04</td>
-      <td>946437.07</td>
-      <td>N/A</td>
-      <td>58.53</td>
-      <td>2013.53</td>
-    </tr>
-  </tbody>
-</table></div></section><section class="table-wrap"><h3>hdbscan_cluster_report.csv</h3><div class="table-inner"><table class="dataframe dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th>hdbscan_cluster</th>
-      <th>titles</th>
-      <th>critic_rating</th>
-      <th>mal_weighted_score</th>
-      <th>rating_gap</th>
-      <th>mal_votes_total</th>
-      <th>mal_favourites</th>
-      <th>mal_popularity_rank</th>
-      <th>release_year</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>-1</td>
-      <td>4</td>
-      <td>8.48</td>
-      <td>8.21</td>
-      <td>-0.26</td>
-      <td>1691378.5</td>
-      <td>118521</td>
-      <td>14.75</td>
-      <td>2005.25</td>
-    </tr>
-    <tr>
-      <td>0</td>
-      <td>26</td>
-      <td>8.05</td>
-      <td>8.02</td>
-      <td>-0.03</td>
-      <td>991767.81</td>
-      <td>282071.33</td>
-      <td>55.58</td>
-      <td>2012.15</td>
-    </tr>
-  </tbody>
-</table></div></section><section class="table-wrap"><h3>birch_cluster_report.csv</h3><div class="table-inner"><table class="dataframe dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th>birch_cluster</th>
-      <th>titles</th>
-      <th>critic_rating</th>
-      <th>mal_weighted_score</th>
-      <th>rating_gap</th>
-      <th>mal_votes_total</th>
-      <th>mal_favourites</th>
-      <th>mal_popularity_rank</th>
-      <th>release_year</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>13</td>
-      <td>8.22</td>
-      <td>8.33</td>
-      <td>0.11</td>
-      <td>1073432.77</td>
-      <td>747041</td>
-      <td>43.69</td>
-      <td>2013.69</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>3</td>
-      <td>8.33</td>
-      <td>8.04</td>
-      <td>-0.29</td>
-      <td>1956704</td>
-      <td>118521</td>
-      <td>5.33</td>
-      <td>2007.67</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>1</td>
-      <td>8.9</td>
-      <td>8.72</td>
-      <td>-0.18</td>
-      <td>895402</td>
-      <td>N/A</td>
-      <td>43</td>
-      <td>1998</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>10</td>
-      <td>7.61</td>
-      <td>7.51</td>
-      <td>-0.1</td>
-      <td>897949.3</td>
-      <td>14937.33</td>
-      <td>67.3</td>
-      <td>2014.7</td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td>3</td>
-      <td>8.73</td>
-      <td>8.33</td>
-      <td>-0.41</td>
-      <td>950614.67</td>
-      <td>84235.67</td>
-      <td>68</td>
-      <td>1997</td>
-    </tr>
-  </tbody>
-</table></div></section><section class="table-wrap"><h3>cluster_descriptions.csv</h3><div class="table-inner"><table class="dataframe dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th>cluster_id</th>
-      <th>short_description</th>
-      <th>representatives</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>Well-regarded by critics and MAL; varied era, solid engagement</td>
-      <td>Re:Zero kara Hajimeru Isekai Seikatsu; Steins;Gate; Toradora!</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>Recent high-rated mainstream hits with strong fandom</td>
-      <td>Jujutsu Kaisen; Mob Psycho 100; Dr. Stone</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>Classic standalone with high critic score</td>
-      <td>Cowboy Bebop</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>Moderately received/divisive series where MAL trails critics</td>
-      <td>Akame ga Kill!; Fairy Tail; Kakegurui</td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td>Iconic, long-running franchises with huge engagement; MAL &lt; critic</td>
-      <td>One Piece; Naruto; Dragon Ball Z; Fullmetal Alchemist</td>
-    </tr>
-    <tr>
-      <td>5</td>
-      <td>Polarizing mega-hit: extremely high engagement but lower scores</td>
-      <td>Sword Art Online</td>
-    </tr>
-    <tr>
-      <td>6</td>
-      <td>Universally acclaimed masterpiece with top engagement</td>
-      <td>Fullmetal Alchemist: Brotherhood</td>
-    </tr>
-  </tbody>
-</table></div></section></div>
+      <h2>Algorithms</h2>
+      <p class="section-note">Each algorithm groups the same engineered feature set, but each one defines a "cluster" differently. That difference is what makes the result comparison meaningful.</p>
+      <div class="algo-grid"><article class="algo"><h3>K-Means</h3><p>Partitions anime into a fixed number of compact groups by repeatedly moving each title toward the nearest centroid.</p><ul><li>Clusters found: 5</li><li>Noise points: 0 (0%)</li><li>Largest cluster: 12</li><li>Silhouette score: 0.18</li></ul></article><article class="algo"><h3>GMM</h3><p>Models each group as a Gaussian distribution so overlapping clusters can still be separated probabilistically.</p><ul><li>Clusters found: 5</li><li>Noise points: 0 (0%)</li><li>Largest cluster: 12</li><li>Silhouette score: 0.1298</li></ul></article><article class="algo"><h3>DBSCAN</h3><p>Builds clusters from dense neighborhoods and marks isolated titles as noise when they do not belong to any dense region.</p><ul><li>Clusters found: 2</li><li>Noise points: 12 (40%)</li><li>Largest cluster: 15</li><li>Silhouette score: 0.3387</li></ul></article><article class="algo"><h3>HDBSCAN</h3><p>Extends density clustering hierarchically so it can adapt to uneven cluster shapes and keep uncertain titles separate.</p><ul><li>Clusters found: 1</li><li>Noise points: 4 (13.33%)</li><li>Largest cluster: 26</li><li>Silhouette score: N/A</li></ul></article><article class="algo"><h3>BIRCH</h3><p>Compresses the feature space into a clustering tree first, then assigns anime to scalable, relatively balanced partitions.</p><ul><li>Clusters found: 5</li><li>Noise points: 0 (0%)</li><li>Largest cluster: 13</li><li>Silhouette score: 0.2029</li></ul></article></div>
     </section>
 
     <section class="section">
-      <h2>Analysis | Verdict</h2>
-      <p>The noisiest model was DBSCAN at 40% noise, while DBSCAN reached the top silhouette score of 0.3387. HDBSCAN found a broad dominant cluster with a smaller noise set, which may indicate the dataset is compact after scaling.</p><div class="verdict"><strong>Verdict:</strong> BIRCH delivered the strongest overall tradeoff in this run. It avoided heavy noise labeling while keeping one of the better silhouette scores. DBSCAN posted the highest raw silhouette, but its noise rate was much higher. Average MAL-vs-critic rating gap across the clustered titles was -0.0621, which suggests the two rating systems were fairly aligned overall.</div>
-      <p class="footer">Generated from project outputs in <code>C:\Users\Chris\Downloads\CS472-ML_Ratings_Predictor\main-project\output</code>.</p>
+      <h2>Results</h2>
+      <p class="section-note">This section only shows the summary visuals that compare all algorithms side by side. Each figure is followed by a short interpretation of what it contributes to the analysis.</p>
+      <div class="graph-grid"><figure class="graph"><img src="algorithm_ratings_comparison.png" alt="Critic Rating vs. MAL Score by Algorithm"><figcaption class="caption"><h3>Critic Rating vs. MAL Score by Algorithm</h3><p>Each panel clusters the same titles using critic ratings and MAL weighted scores, making it easier to see where agreement and disagreement between the two rating systems form natural groups.</p></figcaption></figure><figure class="graph"><img src="algorithm_popularity_comparison.png" alt="Popularity Signals by Algorithm"><figcaption class="caption"><h3>Popularity Signals by Algorithm</h3><p>These scatterplots compare MAL votes and favourites across algorithms, showing whether highly engaged titles form their own communities or stay mixed with the rest of the dataset.</p></figcaption></figure><figure class="graph"><img src="algorithm_metrics_comparison.png" alt="Algorithm Metric Comparison"><figcaption class="caption"><h3>Algorithm Metric Comparison</h3><p>This bar-chart summary compares how many clusters each method found, how much noise it labeled, and how strong the resulting separation was through silhouette score.</p></figcaption></figure><figure class="graph"><img src="algorithm_cluster_size_comparison.png" alt="Cluster Size Comparison"><figcaption class="caption"><h3>Cluster Size Comparison</h3><p>This chart shows how evenly each algorithm distributed titles across clusters, which helps distinguish balanced segmentations from methods dominated by one large group.</p></figcaption></figure></div>
+    </section>
+
+    <section class="section">
+      <h2>Key Findings</h2>
+      <p class="section-note">The cluster descriptions below summarize the K-Means groupings with representative titles, followed by notable facts from the overall algorithm comparison.</p>
+      <div class="finding-grid"><div><div class="algo-grid">
+    <article class="finding"><h3>Cluster 0</h3>
+        <p>Well-regarded by critics and MAL; varied era, solid engagement</p>
+        <div class="finding-meta"><strong>Representative titles:</strong> Re:Zero kara Hajimeru Isekai Seikatsu; Steins;Gate; Toradora!</div>
+        <div class="finding-meta"><strong>Titles in cluster:</strong> 3 | <strong>Avg. critic rating:</strong> 8.4 | <strong>Avg. MAL score:</strong> 8.26</div>
+      
+    </article><article class="finding"><h3>Cluster 1</h3>
+        <p>Recent high-rated mainstream hits with strong fandom</p>
+        <div class="finding-meta"><strong>Representative titles:</strong> Jujutsu Kaisen; Mob Psycho 100; Dr. Stone</div>
+        <div class="finding-meta"><strong>Titles in cluster:</strong> 4 | <strong>Avg. critic rating:</strong> 8.65 | <strong>Avg. MAL score:</strong> 8.24</div>
+      
+    </article><article class="finding"><h3>Cluster 2</h3>
+        <p>Classic standalone with high critic score</p>
+        <div class="finding-meta"><strong>Representative titles:</strong> Cowboy Bebop</div>
+        <div class="finding-meta"><strong>Titles in cluster:</strong> 10 | <strong>Avg. critic rating:</strong> 8.28 | <strong>Avg. MAL score:</strong> 8.36</div>
+      
+      </article><article class="finding"><h3>Cluster 3</h3>
+        <p>Moderately received/divisive series where MAL trails critics</p><div class="finding-meta"><strong>Representative titles:</strong> Akame ga Kill!; Fairy Tail; Kakegurui</div>
+        <div class="finding-meta"><strong>Titles in cluster:</strong> 1 | <strong>Avg. critic rating:</strong> 8.9 | <strong>Avg. MAL score:</strong> 8.72</div>
+      
+      </article><article class="finding"><h3>Cluster 4</h3>
+        <p>Iconic, long-running franchises with huge engagement; MAL &lt; critic</p>
+        <div class="finding-meta"><strong>Representative titles:</strong> One Piece; Naruto; Dragon Ball Z; Fullmetal Alchemist</div>
+        <div class="finding-meta"><strong>Titles in cluster:</strong> 12 | <strong>Avg. critic rating:</strong> 7.63 | <strong>Avg. MAL score:</strong> 7.6</div>
+      
+      </article><article class="finding"><h3>Cluster 5</h3>
+        <p>Polarizing mega-hit: extremely high engagement but lower scores</p>
+        <div class="finding-meta"><strong>Representative titles:</strong> Sword Art Online</div>
+      
+      </article><article class="finding"><h3>Cluster 6</h3>
+        <p>Universally acclaimed masterpiece with top engagement</p>
+        <div class="finding-meta"><strong>Representative titles:</strong> Fullmetal Alchemist: Brotherhood</div>
+      
+      </article></div></div>
+      
+      <aside class="fact-list"><h3>Interesting Facts</h3>
+        <ul><li><strong>BIRCH</strong> was the most balanced overall because it combined the strongest silhouette-minus-noise tradeoff without discarding any titles as noise.</li>
+          <li><strong>DBSCAN</strong> achieved the highest raw silhouette score at 0.3387, but it did so while labeling 12 titles as noise in the noisiest case.</li>
+          <li>The largest disagreement between critic and MAL scoring was <strong>Dragon Ball Z</strong>, where the MAL weighted score differed from the critic score by 0.6299 points.</li>
+          <li>MAL scored <strong>16</strong> titles above the critic rating and <strong>14</strong> below it, which suggests the disconnect exists in both directions rather than in only one consistent bias.</li>
+          <li><strong>Jujutsu Kaisen</strong> was the closest agreement case, with only a 0.0327-point gap between critic and MAL scoring.</li></ul></aside></div>
+    </section>
+
+    <section class="section">
+      <h2>Conclusion</h2>
+      <div class="conclusion"><p>The problem this project is trying to solve is whether popularity can be treated as a proxy for quality. The clustering results suggest the answer is only partially yes: some anime are strong on both critic score and MAL engagement, but other groups show that iconic franchises, divisive hits, and classics can attract very different levels of fan activity without matching critic behavior exactly.</p><p>Across this run, the average signed rating gap was -0.0621 and the average absolute gap was 0.2267, so the disconnect is not overwhelming in every case, but it is large enough to create distinct clusters. <strong>BIRCH</strong> produced the clearest overall tradeoff for telling that story because it separated the dataset without relying on heavy noise labeling.</p></div>
     </section>
   </div>
 </body>

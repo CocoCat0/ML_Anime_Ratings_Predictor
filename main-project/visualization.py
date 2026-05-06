@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from utilities import ensure_output_dir, log
 
+#mapping algorithms to cluster label col in Dataframe
 ALGORITHM_COLUMNS = {
     "K-Means": "kmeans_cluster",
     "GMM": "gmm_cluster",
@@ -27,6 +28,7 @@ def plot_all(
     vae_points,
     vae_history: dict[str, list[float]],
 ) -> None:
+    #creating visualizations: rating scatterplots, popularity scatterplots, cluster size bar charts, algorithm comparison grids, vae latent space plots, vae training loss curve
     output_dir = ensure_output_dir()
 
     _plot_rating_scatter(df, "kmeans_cluster", output_dir / "ratings_scatter.png", "K-Means")
@@ -40,6 +42,7 @@ def plot_all(
     _plot_cluster_sizes(cluster_summaries["HDBSCAN"], output_dir / "hdbscan_cluster_sizes.png", "HDBSCAN Cluster Sizes")
     _plot_rating_scatter(df, "birch_cluster", output_dir / "birch_clusters.png", "BIRCH")
     _plot_cluster_sizes(cluster_summaries["BIRCH"], output_dir / "birch_cluster_sizes.png", "BIRCH Cluster Sizes")
+    #creatinga  multi-algorithm comparison grids
     _plot_algorithm_comparison_grid(
         df,
         x_column="critic_rating",
@@ -54,8 +57,10 @@ def plot_all(
         path=output_dir / "algorithm_popularity_comparison.png",
         title="MyAnimeList Votes vs Favourites",
     )
+    #algorithm-lvl metrics
     _plot_cluster_metric_comparison(comparison_summary, output_dir / "algorithm_metrics_comparison.png")
     _plot_cluster_size_comparison(cluster_summaries, output_dir / "algorithm_cluster_size_comparison.png")
+    #VAE visualizations
     _plot_vae_latent_space(df, vae_points, output_dir / "vae_latent_space.png")
     _plot_vae_algorithm_grid(df, vae_points, output_dir / "vae_algorithm_comparison.png")
     _plot_vae_loss(vae_history, output_dir / "vae_loss.png")
@@ -94,6 +99,7 @@ def _plot_popularity_scatter(df: pd.DataFrame, cluster_column: str, path, label_
 
 
 # Plot how many titles ended up in each cluster.
+#plot how many anime titltes fall under each cluster (detecting unbalanced clusters)
 def _plot_cluster_sizes(cluster_summary: pd.DataFrame, path, title: str) -> None:
     fig, ax = plt.subplots(figsize=(8, 5))
     cluster_summary["titles"].plot(kind="bar", ax=ax, color="#4C78A8")
@@ -105,7 +111,7 @@ def _plot_cluster_sizes(cluster_summary: pd.DataFrame, path, title: str) -> None
     plt.close(fig)
     log(f"Saved {path.name}")
 
-
+#creatinga  2x3 grid comparing each clustering algorithm 
 def _plot_algorithm_comparison_grid(df: pd.DataFrame, x_column: str, y_column: str, path, title: str) -> None:
     fig, axes = plt.subplots(2, 3, figsize=(16, 10))
     axes = axes.flatten()
@@ -124,24 +130,28 @@ def _plot_algorithm_comparison_grid(df: pd.DataFrame, x_column: str, y_column: s
     plt.close(fig)
     log(f"Saved {path.name}")
 
-
+#plots three metrics per algorithm, # of clusters found, noise percentage (dbscan / hdbscan), silhoutte score
 def _plot_cluster_metric_comparison(comparison_summary: pd.DataFrame, path) -> None:
     fig, axes = plt.subplots(1, 3, figsize=(16, 5))
     summary = comparison_summary.reset_index()
 
+    #clusters found
     axes[0].bar(summary["algorithm"], summary["clusters_found"], color="#4C78A8")
     axes[0].set_title("Clusters Found")
     axes[0].set_ylabel("Count")
 
+    #noise share
     axes[1].bar(summary["algorithm"], summary["noise_pct"], color="#F58518")
     axes[1].set_title("Noise Share")
     axes[1].set_ylabel("Percent of Titles")
 
+    #silhoutte score
     silhouette_values = summary["silhouette_score"].fillna(0.0)
     axes[2].bar(summary["algorithm"], silhouette_values, color="#54A24B")
     axes[2].set_title("Silhouette Score")
     axes[2].set_ylabel("Score")
 
+    #formatting
     for ax in axes:
         ax.tick_params(axis="x", rotation=20)
         ax.grid(alpha=0.25, axis="y")
@@ -151,7 +161,7 @@ def _plot_cluster_metric_comparison(comparison_summary: pd.DataFrame, path) -> N
     plt.close(fig)
     log(f"Saved {path.name}")
 
-
+#creatinga  2x3 grid showing cluster size distributions per clustering algorithm
 def _plot_cluster_size_comparison(cluster_summaries: dict[str, pd.DataFrame], path) -> None:
     fig, axes = plt.subplots(2, 3, figsize=(16, 10))
     axes = axes.flatten()
@@ -172,6 +182,7 @@ def _plot_cluster_size_comparison(cluster_summaries: dict[str, pd.DataFrame], pa
 
 # Plot the VAE latent space colored by GMM cluster labels.
 def _plot_vae_latent_space(df: pd.DataFrame, vae_points, path) -> None:
+    #Show how vae compresses anime features
     fig, ax = plt.subplots(figsize=(8, 6))
     scatter = ax.scatter(vae_points[:, 0], vae_points[:, 1], c=df["gmm_cluster"], cmap="tab10", alpha=0.7)
     ax.set_title("VAE Latent Space")
@@ -186,6 +197,7 @@ def _plot_vae_latent_space(df: pd.DataFrame, vae_points, path) -> None:
 
 
 def _plot_vae_algorithm_grid(df: pd.DataFrame, vae_points, path) -> None:
+    #show how clustering algorithm groups titles inside VAE latent space
     fig, axes = plt.subplots(2, 3, figsize=(16, 10))
     axes = axes.flatten()
 
@@ -205,6 +217,7 @@ def _plot_vae_algorithm_grid(df: pd.DataFrame, vae_points, path) -> None:
 
 # Plot the VAE training losses over time.
 def _plot_vae_loss(vae_history: dict[str, list[float]], path) -> None:
+    #plot vae training losses, total loss, reconstruction loss, kl divergence loss
     fig, ax = plt.subplots(figsize=(8, 5))
     ax.plot(vae_history["total_loss"], label="Total loss")
     ax.plot(vae_history["reconstruction_loss"], label="Reconstruction loss")
