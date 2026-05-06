@@ -20,6 +20,7 @@ To manually add K for K clusters is
 ```Python main.py --k (Int # of cluster)```
 
 EX: ```python main.py --k 15```
+
 To run with best K enter (system will utilize a function to find the best k)
 
 ```Python main.py --best-k```
