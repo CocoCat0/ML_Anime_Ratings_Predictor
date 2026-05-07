@@ -6,7 +6,7 @@ Expected Project Outputs:
 - Clustered Datasets
 - CSV report
 - Data Viusalization
-- Auto Generated HTML Website Report (https://cococat0.github.io/ML_Anime_Ratings_Predictor/main-project/output/index.html)\
+- Auto Generated HTML Website Report : https://cococat0.github.io/ML_Anime_Ratings_Predictor/main-project/output/index.html
 
 Algorithms Included:
 - Gausian Mixture Model (GMM)
