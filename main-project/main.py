@@ -28,7 +28,7 @@ from cluster import (
 #import ML utilities (scaling, VAE projection, K selection)
 from ML_training import find_best_k, fit_scaler, train_vae_projection
 #import preprocessing utilities (loading csvs, building feature matrix)
-from preprocessing import get_feature_matrix, load_and_merge_data, prev_raw_anime, prev_raw_popularity, prev_clean_anime, prev_clean_popularity, prev_preprocessed_data
+from preprocessing import get_feature_matrix, load_and_merge_data, prev_raw_anime, prev_raw_popularity, prev_preprocessed_data
 #import report builder & general utilities
 from report_site import build_output_report
 from utilities import CONFIG, check_data_files, ensure_output_dir, log, save_clustered_data
@@ -47,8 +47,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--no-vis", action="store_true", help="Skip plotting")
     #'--raw' to get raw csv data
     parser.add_argument("--raw", action="store_true", help="Print raw datasets before clustering")
-    #'--clean' to get cleaned csv data
-    parser.add_argument("--clean", action="store_true", help="Print cleaned dataset after normalization")
     #'--preprocess' to get preprocessed data that is loaded into the model
     parser.add_argument("--preprocess", action="store_true", help="Print preprocessed merged dataset before clustering")
     return parser.parse_args()
@@ -76,17 +74,6 @@ def main(args: argparse.Namespace) -> None:
         log("----------- Raw Popularity Data -----------")
         raw_popularity = prev_raw_popularity(CONFIG["popularity_dir"])
         print(raw_popularity.head(20).to_string())
-        return
-
-    if args.clean:
-        #cleaned anime dataset
-        log("----------- Cleaned Anime Data -----------")
-        clean_anime = prev_clean_anime(CONFIG["anime_path"])
-        print(clean_anime.head(20).to_string())
-        #cleaned popularity dataset
-        log("----------- Cleaned Popularity Data -----------")
-        clean_pop = prev_clean_popularity(CONFIG["popularity_dir"])
-        print(clean_pop.head(20).to_string())
         return
 
     if args.preprocess:
