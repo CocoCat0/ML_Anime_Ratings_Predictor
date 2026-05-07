@@ -56,7 +56,7 @@ pip install -r enviornment.txt
 OR if using conda environment, enter
 ```bash
 conda env create -f environment.yml
-conda activate ml-anime-ratings-predictor
+conda activate ml_anime_ratings_analysis
 ```
 
 
