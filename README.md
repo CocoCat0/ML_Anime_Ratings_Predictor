@@ -50,7 +50,7 @@ main-project/
 
 Before running the project, install the required python libraries:
 ```bash
-pip install -r requirements.txt
+pip install -r enviornment.txt
 ```
 
 OR if using conda environment, enter
