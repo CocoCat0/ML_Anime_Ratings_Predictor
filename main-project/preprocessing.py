@@ -213,14 +213,6 @@ def prev_raw_popularity(popularity_dir: str | Path) -> pd.DataFrame:
     snapshots = [pd.read_csv(path) for path in files]
     return pd.concat(snapshots, ignore_index = True)
 
-#get cleaned anime data
-def prev_clean_anime(filepath: str | Path) ->pd.DataFrame:
-    return load_anime_database(filepath)
-
-#get cleaned popularity data
-def prev_clean_popularity(popularity_dir: str | Path) -> pd.DataFrame:
-    return load_popularity_database(popularity_dir)
-
 #prev final preprocessed and merged datafram before clustering
 def prev_preprocessed_data (anime_path: str | Path, popularity_dir: str | Path, ) -> pd.DataFrame:
     return load_and_merge_data(anime_path, popularity_dir)
